@@ -14,6 +14,7 @@ def load_bgs_amounts(file_path, encoding='latin1'):
         reader = csv.reader(file)
         
         for i, row in enumerate(reader):
+            print(i)
             if i==1:
                 begin = row.index("Month end:")+1
                 end = row.index("END")
