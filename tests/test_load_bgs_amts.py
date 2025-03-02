@@ -3,8 +3,17 @@ from unittest.mock import mock_open, patch
 import pandas as pd
 from io import StringIO
 import random
+from pandas.testing import assert_frame_equal
+import pytest
 
-def test_load_bgs_amounts():
+@pytest.fixture
+def mock_df():
+    return pd.DataFrame(
+        {"index":["Jun 2024","Jul 2024"], "Sum of Conventionals": ["3", "225"]},
+          index=[0, 1]
+    )
+
+def test_load_bgs_amounts(mock_df):
     mock_csv_content = f"""Top,,,,,
     Next,Month end:,Jun 2024,Jul 2024,END,
     Sequence,,,,,
@@ -13,7 +22,7 @@ def test_load_bgs_amounts():
     5, txt, {','.join([str(random.randint(1,10)) for x in range(2)])},END,
     6,txt, {','.join([str(random.randint(1,10)) for x in range(2)])},END,
     7,txt, {','.join([str(random.randint(1,10)) for x in range(2)])},END,
-    Sum of Conventionals,,,225,END,
+    Sum of Conventionals,,"3","225",END,
     Index-linked,,,,END,
     Old-style,,,,END,
     10,txt, {','.join([str(random.randint(1,10)) for x in range(2)])},END,
@@ -58,3 +67,7 @@ def test_load_bgs_amounts():
     assert "Calculated indexed nominal New-style" in result
     assert "Sum of Conventionals" in result
     assert "Sum of total conventional and indexed-linked" in result
+    assert type(result["Sum of Conventionals"]) == pd.DataFrame
+
+    assert_frame_equal(result["Sum of Conventionals"],mock_df, check_like=True)
+    

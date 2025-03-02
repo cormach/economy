@@ -14,7 +14,6 @@ def load_bgs_amounts(file_path, encoding='latin1'):
         reader = csv.reader(file)
         
         for i, row in enumerate(reader):
-            print(i)
             if i==1:
                 begin = row.index("Month end:")+1
                 end = row.index("END")
@@ -56,11 +55,10 @@ def load_bgs_amounts(file_path, encoding='latin1'):
                 if current_block==[]:
                     pass
                 else:
-                    print(current_title, len(current_block))
                     if linker_type:
-                        dataframes[current_title+f" {linker_type}"] = pd.DataFrame(current_block, columns=columns, index=indexer)
+                        dataframes[current_title+f" {linker_type}"] = pd.DataFrame(current_block, columns=columns, index=indexer).T
                     else:
-                        dataframes[current_title] = pd.DataFrame(current_block, columns=columns, index=indexer)
+                        dataframes[current_title] = pd.DataFrame(current_block, columns=columns, index=indexer).T
                     current_block = []
 
             if "New-style" in row[0]:
@@ -71,13 +69,17 @@ def load_bgs_amounts(file_path, encoding='latin1'):
                 continue            
 
             if "Sum of Conventionals" in row[0]:
+                conventional_series = pd.Series(row[begin:end], index=columns, name="Sum of Conventionals")
 
-                dataframes["Sum of Conventionals"] = pd.DataFrame(dict(zip(row[begin:end],columns)), index=[0])
+                dataframes["Sum of Conventionals"] = conventional_series.reset_index()
                 collecting_data=False
             if "Sum of total conventional and indexed-linked" in row[2]:
-
-                dataframes["Sum of total conventional and indexed-linked"] = pd.DataFrame( dict(zip(row[begin:end],columns)), index=[0])
-                collecting_data=False           
+                nominal_gilt_total = pd.Series(row[begin:end], index=columns, name="Sum of total conventional and indexed-linked")
+                dataframes["Sum of total conventional and indexed-linked"] = nominal_gilt_total.reset_index()
+                collecting_data=False       
+                
+    print(dataframes['Sum of Conventionals'])
+         
     return dataframes
 
 
