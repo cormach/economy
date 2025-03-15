@@ -6,12 +6,14 @@ import random
 from pandas.testing import assert_frame_equal
 import pytest
 
+
 @pytest.fixture
 def mock_df():
     return pd.DataFrame(
-        {"index":["Jun 2024","Jul 2024"], "Sum of Conventionals": ["3", "225"]},
-          index=[0, 1]
+        {"index": ["Jun 2024", "Jul 2024"], "Sum of Conventionals": ["3", "225"]},
+        index=[0, 1],
     )
+
 
 def test_load_bgs_amounts(mock_df):
     mock_csv_content = f"""Top,,,,,
@@ -55,10 +57,10 @@ def test_load_bgs_amounts(mock_df):
     END,,Sum of index-linked, indexed,'2',END,
     ,,Sum of total conventional and indexed-linked,,210,
     END,END,END,END,END,"""
-    
+
     with patch("builtins.open", mock_open(read_data=mock_csv_content)):
         result = load_bgs_amounts("dummy_path.csv")
-    
+
     assert isinstance(result, dict)
     assert "Conventionals" in result
     assert "Index-linked Old-style" in result
@@ -69,5 +71,4 @@ def test_load_bgs_amounts(mock_df):
     assert "Sum of total conventional and indexed-linked" in result
     assert type(result["Sum of Conventionals"]) == pd.DataFrame
 
-    assert_frame_equal(result["Sum of Conventionals"],mock_df, check_like=True)
-    
+    assert_frame_equal(result["Sum of Conventionals"], mock_df, check_like=True)
