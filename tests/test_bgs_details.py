@@ -101,6 +101,7 @@ END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,
         index=["55200", "55800"],
     )
 
+    assert len(result) == 3
     assert "Conventionals" in result
     assert "Index-Linked New-style" in result
-    assert len(result) == 3
+

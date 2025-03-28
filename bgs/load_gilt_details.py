@@ -16,38 +16,7 @@ def load_csv_blocks(file_path, encoding="latin1"):
     with open(file_path, "r", encoding=encoding) as file:
         reader = csv.reader(file, quotechar='"', delimiter=",")
         begin = 1
-        linker_type = None
         for i, row in enumerate(reader):
-
-            match row[0]:
-                case "Conventional stocks":
-                    current_title = "Conventionals"
-                    continue
-
-                case "Index linked stocks":
-                    current_title = "Index-Linked"
-                    current_block = []
-                    indexer = []
-                    continue
-
-                case "Old-style":
-                    current_block = []
-                    indexer = []
-                    collecting_data = True
-                    linker_type = "Old-style"
-                    continue
-
-                case "New-style":
-                    current_block = []
-                    indexer = []
-                    collecting_data = True
-                    linker_type = "New-style"
-                    continue
-
-                case "Sequence":
-                    end = row.index("END")
-                    columns = row[begin:end]
-                    continue
 
             if row[0] is None:
                 collecting_data = False
@@ -56,23 +25,64 @@ def load_csv_blocks(file_path, encoding="latin1"):
                 collecting_data = True
             except:
                 collecting_data = False
-
+            print(f"count={i}, row={row[0]}, collecting={collecting_data}, il={index_linked}, new/old={linker_type}")
             if collecting_data:
+                print('collecting data')
                 current_block.append(row[begin:end])
                 indexer.append(row[0])
+                print(current_block)
             else:
                 if current_block == []:
-                    pass
+                    print('empty block')
                 else:
-                    if linker_type:
-                        dataframes[current_title + f" {linker_type}"] = pd.DataFrame(
-                            current_block, columns=columns, index=indexer
-                        )
-                    else:
-                        dataframes[current_title] = pd.DataFrame(
-                            current_block, columns=columns, index=indexer
-                        )
-                    current_block = []
+                    match collecting_data:
+                        case True:
+                            pass
+                        case False:
+
+                            print('block', current_block)
+                            if linker_type:
+                                dataframes[current_title + f" {linker_type}"] = pd.DataFrame(
+                                    current_block, columns=columns, index=indexer
+                                )
+                            else:
+                                dataframes[current_title] = pd.DataFrame(
+                                    current_block, columns=columns, index=indexer
+                            )
+                            current_block = []
+                            indexer = []
+            print(len(dataframes))
+            print(dataframes.keys())
+
+
+            match row[0]:
+                case "Conventional stocks":
+                    current_title = "Conventionals"
+
+                case "Index linked stocks":
+                    current_title = "Index-Linked"
+                    index_linked = True
+
+                case "Old-style":
+                    print('old style')
+                    collecting_data = True
+                    linker_type = "Old-style"
+
+                case "New-style":
+                    print('new-style')
+                    collecting_data = True
+                    linker_type = "New-style"
+
+
+                case "Sequence":
+                    end = row.index("END")
+                    columns = row[begin:end]
+                case "END":
+                    collecting_data = False
+
+
+
+
 
     return dataframes
 
