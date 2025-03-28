@@ -30,6 +30,7 @@ def load_csv_blocks(file_path, encoding="latin1"):
                 indexer.append(row[0])
             else:
                 if current_block == []:
+                    pass
                 else:
                     match collecting_data:
                         case True:
