@@ -90,8 +90,6 @@ def load_bgs_amounts(file_path, encoding="latin1"):
                 )
                 collecting_data = False
 
-    print(dataframes["Sum of Conventionals"])
-
     return dataframes
 
 
