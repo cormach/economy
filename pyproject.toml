@@ -6,8 +6,9 @@ authors = [
     {name = "Cormac Hollingsworth"}
 ]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
+    "matplotlib (>=3.10.1,<4.0.0)"
 ]
 
 [tool.poetry]
