@@ -52,17 +52,21 @@ def load_bgs_amounts(file_path, encoding="latin1"):
                 current_block.append(row[begin:end])
                 indexer.append(row[0])
             else:
+
                 if current_block == []:
                     pass
                 else:
+                    clean_columns = [col for col in columns if col != ""]
                     if linker_type:
-                        dataframes[current_title + f" {linker_type}"] = pd.DataFrame(
+                        df_input = pd.DataFrame(
                             current_block, columns=columns, index=indexer
-                        ).T
+                        )
+                        dataframes[current_title + f" {linker_type}"] = df_input[clean_columns].T
                     else:
-                        dataframes[current_title] = pd.DataFrame(
+                        df_input = pd.DataFrame(
                             current_block, columns=columns, index=indexer
-                        ).T
+                        )
+                        dataframes[current_title] = df_input[clean_columns].T
                     current_block = []
 
             if "New-style" in row[0]:
@@ -86,7 +90,7 @@ def load_bgs_amounts(file_path, encoding="latin1"):
                     name="Sum of total conventional and indexed-linked",
                 )
                 dataframes["Sum of total conventional and indexed-linked"] = (
-                    nominal_gilt_total.reset_index()
+                    nominal_gilt_total
                 )
                 collecting_data = False
 

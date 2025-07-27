@@ -1,7 +1,8 @@
 import csv
 import pandas as pd
-
-
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 def load_prices(file_path):
     with open(file_path, "r", encoding="latin1") as file:
         reader = csv.reader(file)
@@ -20,8 +21,10 @@ def load_prices(file_path):
 
     data = pd.DataFrame(block, columns=columns, index=index)
     data = data.map(convert_to_float)
+    columns = [col for col in columns if col != ""]
+    logger.info(columns)
 
-    return data.T
+    return data[columns].T
 
 
 def convert_to_float(x):

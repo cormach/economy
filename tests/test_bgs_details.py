@@ -1,7 +1,7 @@
 from unittest.mock import mock_open, patch
 import pandas as pd
 
-from bgs.load_gilt_details import load_csv_blocks, process_index_linked_stocks
+from bgs.load_gilt_details import load_csv_blocks
 
 
 def test_load_details():
