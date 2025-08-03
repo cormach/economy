@@ -853,6 +853,54 @@ files = [
 ]
 
 [[package]]
+name = "quantlib"
+version = "1.39"
+description = "Python bindings for the QuantLib library"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "QuantLib-1.39-cp38-abi3-macosx_10_13_x86_64.whl", hash = "sha256:bd1c689d949f01d6d533b07bd1516039435ebbac78d8e339300deecab0360d41"},
+    {file = "QuantLib-1.39-cp38-abi3-macosx_11_0_arm64.whl", hash = "sha256:b9dbd0285efe663e4336c71d163f29c16aa785be29c19a832ab48dd47ac1180c"},
+    {file = "QuantLib-1.39-pp311-pypy311_pp73-macosx_10_15_x86_64.whl", hash = "sha256:b9b1862b4bbf4c653a94ba0445f3b8582437a850f43aace5e28922c765f3f77b"},
+    {file = "QuantLib-1.39-pp311-pypy311_pp73-macosx_11_0_arm64.whl", hash = "sha256:08d5ff228726d05ae3b592855a86cefe8b8dfdf88946e6c663b86c5f3efd3518"},
+    {file = "quantlib-1.39-cp38-abi3-manylinux2014_i686.manylinux_2_17_i686.whl", hash = "sha256:9213202cef50964af38ef143253a7822ea58304c1ca35695da11dd000ac49001"},
+    {file = "quantlib-1.39-cp38-abi3-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:788c545ed68eaf0ec07bf3eb5308d87f6793e6caeb3c4eda22cd1c5f1a5fb204"},
+    {file = "quantlib-1.39-cp38-abi3-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:fac4e65619c42d2be05ab1f9b215ba7a9692c1d1b2cb9727d732c23717bbb26a"},
+    {file = "quantlib-1.39-cp38-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:5988e9123494c4b362b2d34db62959a0f4510c289835c08b499c7037f3f1a97d"},
+    {file = "quantlib-1.39-cp38-abi3-musllinux_1_2_i686.whl", hash = "sha256:db058c2f6f3e38b97e5105aba3ab3126f44e88602ccb6a05eef9cbf0a2a6ef17"},
+    {file = "quantlib-1.39-cp38-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:6301268b7aa21a61e642c0e8d665903c2896769e5830d02a28097861a13319e0"},
+    {file = "quantlib-1.39-cp38-abi3-win32.whl", hash = "sha256:ceaef9369de0aebba2c91476066fe92fb19a6f4ccecc7082ede25f8dd83208a7"},
+    {file = "quantlib-1.39-cp38-abi3-win_amd64.whl", hash = "sha256:8040b5345c96d55d28ada9a907a08dd5eea3205925401c86443f8dbf31a5c960"},
+    {file = "quantlib-1.39-pp311-pypy311_pp73-manylinux2014_i686.manylinux_2_17_i686.whl", hash = "sha256:eed9e923a54490ac01ebc06f43e82eb62d604b8c1a7313d7d172c47a95754d9a"},
+    {file = "quantlib-1.39-pp311-pypy311_pp73-manylinux_2_24_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:8dc439894394f245ae3f14dbad0a5fb921199eb17daa82d1898a52de8ac1acca"},
+    {file = "quantlib-1.39-pp311-pypy311_pp73-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:f56c6040c9a9547aab547b8ad2fac32365242b4b76eecfd8ab577ceb3862d701"},
+    {file = "quantlib-1.39-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:ab85edf559940584764247dead6a9c5f64a6be22116729248552780ff597f383"},
+]
+
+[[package]]
+name = "rateslib"
+version = "2.0.1"
+description = "A fixed income library for trading interest rates"
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "rateslib-2.0.1-cp310-abi3-macosx_10_12_x86_64.whl", hash = "sha256:9bb4899802a50efd7f7deca5be836834a0c867e097c1b8527c5d55943cd28b13"},
+    {file = "rateslib-2.0.1-cp310-abi3-macosx_11_0_arm64.whl", hash = "sha256:861c44af189791996b7f16220f80a4abf67a1486211c206e09e37fa37cb0c226"},
+    {file = "rateslib-2.0.1-cp310-abi3-win_amd64.whl", hash = "sha256:3ae6ceed15a89cfefbe583709f2dcc7cb2636808334543231689c55daf9425ca"},
+    {file = "rateslib-2.0.1.tar.gz", hash = "sha256:07c08fad1de9b74eb142d4ad526a2023905d2038e4ad2eacc49fbaa3bed41483"},
+]
+
+[package.dependencies]
+matplotlib = ">=3.5.1,<4.0"
+numpy = ">=1.21.5,<3.0"
+pandas = ">=1.4.1,<3.0"
+
+[package.extras]
+dev = ["coverage (>=7.6.1,<8.0)", "jupyterlab (>=4.0,<5.0)", "mypy (>=1.13,<2.0)", "nbsphinx (>=0.9.5,<1.0)", "pandas-stubs (>2.0,<3.0)", "pickleshare (>=0.7.5,<1.0)", "pydata-sphinx-theme (>=0.15.4,<1.0)", "pytest (>=8.3.2,<9.0)", "ruff (>=0.6.3,<1.0)", "sphinx (>=8.0,<8.2)", "sphinx-automodapi (>=0.16.0,<1.0)", "sphinx-tabs (>=3.4,<4.0)", "sphinxcontrib-googleanalytics (>=0.4,<1.0)"]
+
+[[package]]
 name = "requests"
 version = "2.32.4"
 description = "Python HTTP for Humans."
@@ -975,4 +1023,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "5da096aa30b0a931a2f193fa6f8c0b24ae8c986171b649a86ae0b4bcc5805fd6"
+content-hash = "c49febd8c261a8c3d94d4b8b51fdf57aac84c725dc6f8e19b8707d12f5277726"
