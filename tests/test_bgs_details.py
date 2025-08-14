@@ -27,7 +27,7 @@ END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,
     with patch("builtins.open", mock_open(read_data=mock_csv_content)):
         result = load_csv_blocks("dummy_path.csv")
 
-    pd.DataFrame(
+    conv = pd.DataFrame(
         {
             "Inst Code": ["4HCV64", "2TAN"],
             "Sedol": ["", ""],
@@ -62,7 +62,7 @@ END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,
         index=["100", "32700"],
     )
 
-    pd.DataFrame(
+    il = pd.DataFrame(
         {
             "Inst Code": ["1QIL17", "0AIL73"],
             "Sedol": ["B0V3WQ7", "BM8Z2W6"],
@@ -104,4 +104,8 @@ END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,
     assert len(result) == 3
     assert "Conventionals" in result
     assert "Index-Linked New-style" in result
+    assert "Index-Linked Old-style" in result
 
+    assert result["Conventionals"].equals(conv)
+    assert result["Index-Linked New-style"].equals(il)
+    assert result["Index-Linked Old-style"].equals(il)  
