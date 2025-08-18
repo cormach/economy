@@ -92,6 +92,7 @@ def load_csv_blocks(file_path, encoding="latin1"):
 
                 case "END":
                     collecting_data = False
+                    break
             logger.info(f"Columns: {len(columns) }")
             logger.info(f"Current title: {current_title }")
             logger.info(f"Linker Type: {linker_type }")
