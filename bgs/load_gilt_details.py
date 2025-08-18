@@ -93,8 +93,15 @@ def load_csv_blocks(file_path, encoding="latin1"):
                 case "END":
                     collecting_data = False
                     break
-            logger.info(f"Columns: {len(columns) }")
-            logger.info(f"Current title: {current_title }")
-            logger.info(f"Linker Type: {linker_type }")
+    
+    try:
+        assert (dataframes["Conventionals"]['Sequence'].astype(float) < 50000).all()
+        assert (dataframes["Index-Linked New-style"]['Sequence'].astype(float) < 60000).all()
+        assert (dataframes["Index-Linked Old-style"]['Sequence'].astype(float) < 55200).all()
+    except AssertionError:
+        logger.error("Assertion failed")
+        logger.error(f"Conventionals Shape Unchanged: {(dataframes['Conventionals']['Sequence'].astype(float) < 50000).all()}")
+        logger.error(f"Index-Linked New-style Shape Unchanged: {(dataframes['Index-Linked New-style']['Sequence'].astype(float) < 60000).all()}")
+        logger.error(f"Index-Linked Old-style Shape Unchanged: {(dataframes['Index-Linked Old-style']['Sequence'].astype(float) < 55200).all()}")
 
     return dataframes
