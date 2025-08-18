@@ -1,21 +1,25 @@
 import pandas as pd
 import builtins
-
+from collections import Counter
 import csv
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def load_csv_blocks(file_path, encoding="latin1"):
     dataframes = {}
     current_block = []
     current_title = None
-    indexer = []
     index_linked = False
     linker_type = None
     collecting_data = False
+    columns = []
 
     with open(file_path, "r", encoding=encoding) as file:
         reader = csv.reader(file, quotechar='"', delimiter=",")
-        begin = 1
+        begin = 0
         for i, row in enumerate(reader):
 
             if row[0] is None:
@@ -27,7 +31,7 @@ def load_csv_blocks(file_path, encoding="latin1"):
                 collecting_data = False
             if collecting_data:
                 current_block.append(row[begin:end])
-                indexer.append(row[0])
+
             else:
                 if current_block == []:
                     pass
@@ -37,15 +41,18 @@ def load_csv_blocks(file_path, encoding="latin1"):
                             pass
                         case False:
                             if linker_type:
-                                dataframes[current_title + f" {linker_type}"] = pd.DataFrame(
-                                    current_block, columns=columns, index=indexer
+                                dataframes[current_title + f" {linker_type}"] = (
+                                    pd.DataFrame(
+                                        current_block,
+                                        columns=columns,
+                                    )
                                 )
                             else:
                                 dataframes[current_title] = pd.DataFrame(
-                                    current_block, columns=columns, index=indexer
-                            )
+                                    current_block,
+                                    columns=columns,
+                                )
                             current_block = []
-                            indexer = []
 
             match row[0]:
                 case "Conventional stocks":
@@ -63,15 +70,30 @@ def load_csv_blocks(file_path, encoding="latin1"):
                     collecting_data = True
                     linker_type = "New-style"
 
-
                 case "Sequence":
                     end = row.index("END")
                     columns = row[begin:end]
+                    c = Counter(columns)
+
+                    fill = {}
+                    for col, count in c.items():
+                        if count > 1:
+                            fill[col] = iter(range(count))
+
+                    non_duplicate_columns = []
+                    for col in columns:
+                        increment = None
+                        if c[col] > 1:
+                            increment = fill[col].__next__()
+                        non_duplicate_columns.append(
+                            f"{col} {increment + 1}" if increment is not None else col
+                        )
+                    columns = non_duplicate_columns
+
                 case "END":
                     collecting_data = False
-
-
-
-
+            logger.info(f"Columns: {len(columns) }")
+            logger.info(f"Current title: {current_title }")
+            logger.info(f"Linker Type: {linker_type }")
 
     return dataframes

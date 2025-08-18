@@ -2,6 +2,9 @@ from unittest.mock import mock_open, patch
 import pandas as pd
 
 from bgs.load_gilt_details import load_csv_blocks
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def test_load_details():
@@ -29,6 +32,7 @@ END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,
 
     conv = pd.DataFrame(
         {
+            "Sequence": ["100", "32700"],
             "Inst Code": ["4HCV64", "2TAN"],
             "Sedol": ["", ""],
             "ISIN Code": ["", "GB0000436294"],
@@ -51,19 +55,26 @@ END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,
             "Payment date 4": ["", "5 Oct"],
             "First coupon": ["1.470800", ""],
             "Last coupon": ["", "0.6875"],
-            "Col for I-L": ["", ""],
+            "Col for I-L 1": ["", ""],
+            "Col for I-L 2": ["", ""],
+            "Col for I-L 3": ["", ""],
+            "Col for I-L 4": ["", ""],
+            "Col for I-L 5": ["", ""],
             "Number of calls": ["", ""],
             "Call payment 1": ["", ""],
-            "due on": ["", ""],
+            "due on 1": ["", ""],
             "Call payment 2": ["", ""],
+            "due on 2": ["", ""],
             "Call payment 3": ["", ""],
+            "due on 3": ["", ""],
             "Call payment 4": ["", ""],
-        },
-        index=["100", "32700"],
+            "due on 4": ["", ""],
+        }
     )
 
     il = pd.DataFrame(
         {
+            "Sequence": ["55200", "55800"],
             "Inst Code": ["1QIL17", "0AIL73"],
             "Sedol": ["B0V3WQ7", "BM8Z2W6"],
             "ISIN Code": ["GB00B0V3WQ75", "GB00BM8Z2W66"],
@@ -92,13 +103,57 @@ END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,
             "Base RPI": ["193.72500", ""],
             "Number of calls": ["", ""],
             "Call payment 1": ["", ""],
-            "due on": ["", ""],
+            "due on 1": ["", ""],
             "Call payment 2": ["", ""],
+            "due on 2": ["", ""],
             "Call payment 3": ["", ""],
+            "due on 3": ["", ""],
             "Call payment 4": ["", ""],
+            "due on 4": ["", ""],
             "": ["", ""],
-        },
-        index=["55200", "55800"],
+        }
+    )
+
+    old_style = pd.DataFrame(
+        {
+            "Sequence": ["50000", "51900"],
+            "Inst Code": ["2IL88", "2IL35"],
+            "Sedol": ["", "3179082"],
+            "ISIN Code": ["", "GB0031790826"],
+            "%": ["2", "2"],
+            "Stock": ["Index-linked", "Index-linked"],
+            "Suffix": ["", ""],
+            "Special features": ["", ""],
+            "First year": ["", ""],
+            "Last year": ["1988", "2035"],
+            "Issue date": ["19 Mar 1982", "11 Jul 2002"],
+            "First coupon payable on date": ["30 Sep 1982", "26 Jan 2003"],
+            "Earliest redemption date": ["", ""],
+            "Latest redemption date": ["30 Mar 1988", "26 Jan 2035"],
+            "A (B, C ...) stock merged on date": ["", ""],
+            "Actually redeemed": ["30 Mar 1988", ""],
+            "Frequency": ["2", "2"],
+            "Payment date 1": ["30 Mar", "26 Jan"],
+            "Payment date 2": ["30 Sep", "26 Jul"],
+            "Payment date 3": ["", ""],
+            "Payment date 4": ["", ""],
+            "First coupon": ["0.9996", "1.099091"],
+            "IL coupon rounding": ["4", "6"],
+            "IL redemption rounding": ["4", "6"],
+            "Indexing lag": ["8", "8"],
+            "Base month": ["Jul 1981", "Nov 2001"],
+            "Base RPI": ["75.310520", "173.6"],
+            "Number of calls": ["2", ""],
+            "Call payment 1": ["50", ""],
+            "due on 1": ["19 Mar 1982", ""],
+            "Call payment 2": ["47.5", ""],
+            "due on 2": ["29 Apr 1982", ""],
+            "Call payment 3": ["", ""],
+            "due on 3": ["", ""],
+            "Call payment 4": ["", ""],
+            "due on 4": ["", ""],
+            "": ["", ""],
+        }
     )
 
     assert len(result) == 3
@@ -108,4 +163,4 @@ END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,
 
     assert result["Conventionals"].equals(conv)
     assert result["Index-Linked New-style"].equals(il)
-    assert result["Index-Linked Old-style"].equals(il)  
+    assert result["Index-Linked Old-style"].equals(old_style)

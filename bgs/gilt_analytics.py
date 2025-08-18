@@ -3,12 +3,12 @@ import QuantLib as ql
 schedule = ql.Schedule(
     ql.Date(15, 12, 2019),
     ql.Date(15, 12, 2029),
-    ql.Period('1Y'),
+    ql.Period("1Y"),
     ql.TARGET(),
     ql.Unadjusted,
     ql.Unadjusted,
     ql.DateGeneration.Backward,
-    False
+    False,
 )
 
 bond = ql.FixedRateBond(
@@ -18,7 +18,7 @@ bond = ql.FixedRateBond(
     coupons=[0.05],
     paymentDayCounter=ql.ActualActual(ql.ActualActual.Bond),
 )
-p= bond.cleanPrice(
+p = bond.cleanPrice(
     0.03,
     ql.ActualActual(ql.ActualActual.Bond),
     ql.Compounded,

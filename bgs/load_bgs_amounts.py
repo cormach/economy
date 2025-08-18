@@ -61,7 +61,9 @@ def load_bgs_amounts(file_path, encoding="latin1"):
                         df_input = pd.DataFrame(
                             current_block, columns=columns, index=indexer
                         )
-                        dataframes[current_title + f" {linker_type}"] = df_input[clean_columns].T
+                        dataframes[current_title + f" {linker_type}"] = df_input[
+                            clean_columns
+                        ].T
                     else:
                         df_input = pd.DataFrame(
                             current_block, columns=columns, index=indexer
