@@ -93,7 +93,8 @@ def load_csv_blocks(file_path, encoding="latin1"):
                 case "END":
                     collecting_data = False
                     break
-    
+    # incredibly the BGS has a data error on the id in the details
+    dataframes["Conventionals"]=dataframes["Conventionals"].replace('32112', '32120')
     try:
         assert (dataframes["Conventionals"]['Sequence'].astype(float) < 50000).all()
         assert (dataframes["Index-Linked New-style"]['Sequence'].astype(float) < 60000).all()
