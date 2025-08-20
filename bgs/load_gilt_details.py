@@ -94,15 +94,25 @@ def load_csv_blocks(file_path, encoding="latin1"):
                     collecting_data = False
                     break
     # incredibly the BGS has a data error on the id in the details
-    dataframes["Conventionals"]=dataframes["Conventionals"].replace('32112', '32110')
+    dataframes["Conventionals"] = dataframes["Conventionals"].replace("32112", "32110")
     try:
-        assert (dataframes["Conventionals"]['Sequence'].astype(float) < 50000).all()
-        assert (dataframes["Index-Linked New-style"]['Sequence'].astype(float) < 60000).all()
-        assert (dataframes["Index-Linked Old-style"]['Sequence'].astype(float) < 55200).all()
+        assert (dataframes["Conventionals"]["Sequence"].astype(float) < 50000).all()
+        assert (
+            dataframes["Index-Linked New-style"]["Sequence"].astype(float) < 60000
+        ).all()
+        assert (
+            dataframes["Index-Linked Old-style"]["Sequence"].astype(float) < 55200
+        ).all()
     except AssertionError:
         logger.error("Assertion failed")
-        logger.error(f"Conventionals Shape Unchanged: {(dataframes['Conventionals']['Sequence'].astype(float) < 50000).all()}")
-        logger.error(f"Index-Linked New-style Shape Unchanged: {(dataframes['Index-Linked New-style']['Sequence'].astype(float) < 60000).all()}")
-        logger.error(f"Index-Linked Old-style Shape Unchanged: {(dataframes['Index-Linked Old-style']['Sequence'].astype(float) < 55200).all()}")
+        logger.error(
+            f"Conventionals Shape Unchanged: {(dataframes['Conventionals']['Sequence'].astype(float) < 50000).all()}"
+        )
+        logger.error(
+            f"Index-Linked New-style Shape Unchanged: {(dataframes['Index-Linked New-style']['Sequence'].astype(float) < 60000).all()}"
+        )
+        logger.error(
+            f"Index-Linked Old-style Shape Unchanged: {(dataframes['Index-Linked Old-style']['Sequence'].astype(float) < 55200).all()}"
+        )
 
     return dataframes
