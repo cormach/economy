@@ -19,7 +19,6 @@ def gilt_yield(today, issue_date, maturity_date, first_cpn_date, last_cpn_date, 
     termination_business_convention=ql.Unadjusted
     date_generation=ql.DateGeneration.Forward
     end_of_month=False
-    coupon = .0425
 
     fbSchedule=ql.Schedule(issue_dt, 
                         mat_dt,
