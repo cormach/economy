@@ -212,7 +212,7 @@ for tenor, quote in inflation_quotes:
 fixing_frequency = ql.Monthly
 
 inflation_curve = ql.PiecewiseZeroInflation(
-    referenceDate=today,
+    referenceDate=evaluationDate,
     baseDate=rpi.lastFixingDate(),
     frequency=fixing_frequency,
     dayCounter=ql.Actual365Fixed(),
@@ -236,9 +236,9 @@ fixedPaymentCalendar = ql.UnitedKingdom()
 contractObservationLag = ql.Period(3, ql.Months)
 observationInterpolation = ql.CPI.Linear
 settlementDays = 3
-growthOnly = True
+growthOnly = False
 
-baseCPI = 213.4
+baseCPI = rpi.pastFixing(calendar.advance(issue_date, -lag, ql.Months))
 
 
 fixedSchedule = ql.Schedule(
@@ -290,14 +290,15 @@ print(cashflows[0])
 print(cashflows[1])
 print(len(cashflows))
 print(bond.settlementDate())
-print(cashflows[0][1] - bond.settlementDate())
-
+print([s for s in fixedSchedule.until(bond.settlementDate())])
 # DMO
 
 # Number of calendar days from the settlement date to the next quasi-coupon date r
-days_to_next_coupon = 0.0
+days_to_next_coupon = cashflows[0][1] - bond.settlementDate()
+print("Days to next coupon:", days_to_next_coupon)
 # number of full days between quasi-coupon dates s
-days_between_coupon = 1.0
+days_between_coupon = cashflows[0][1] - [s for s in fixedSchedule.until(bond.settlementDate())][-2] 
+print("Days between coupon:", days_between_coupon)
 # Cash flow due on next quasi-coupon date, per £100 nominal of the     gilt (may be zero if the gilt has a long first dividend period or if the gilt     settles in its ex-dividend period; or may be greater or less than 2 c      times the RPI Ratio during long or short first dividend periods      respectively).
 d_1 = 0.0
 # Cash flow due on next but one quasi-coupon date, per £100      nominal of the gilt (may be greater than 2 c times the RPI Ratio during     long first dividend periods)4.
