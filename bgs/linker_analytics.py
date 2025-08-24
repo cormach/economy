@@ -1,5 +1,6 @@
 import QuantLib as ql
 import datetime as dt
+import pandas as pd
 
 # https://www.quantlibguide.com/Inflation%20indexes%20and%20curves.html
 
@@ -116,38 +117,24 @@ ql.Settings.instance().evaluationDate = evaluationDate
 
 rpi = ql.UKRPI()
 
-inflation_fixings = [
-    ((2007, ql.July), 206.1),
-    ((2007, ql.August), 207.3),
-    ((2007, ql.September), 208.0),
-    ((2007, ql.October), 208.9),
-    ((2007, ql.November), 209.7),
-    ((2007, ql.December), 210.9),
-    ((2008, ql.January), 209.8),
-    ((2008, ql.February), 211.4),
-    ((2008, ql.March), 212.1),
-    ((2008, ql.April), 214.0),
-    ((2008, ql.May), 215.1),
-    ((2008, ql.June), 216.8),
-    ((2008, ql.July), 216.5),
-    ((2008, ql.August), 217.2),
-    ((2008, ql.September), 218.4),
-    ((2008, ql.October), 217.7),
-    ((2008, ql.November), 216.0),
-    ((2008, ql.December), 212.9),
-    ((2009, ql.January), 210.1),
-    ((2009, ql.February), 211.4),
-    ((2009, ql.March), 211.3),
-    ((2009, ql.April), 211.5),
-    ((2009, ql.May), 212.8),
-    ((2009, ql.June), 213.4),
-    ((2009, ql.July), 213.4),
-    ((2009, ql.August), 213.4),
-    ((2009, ql.September), 214.4),
-]
+df_ons_rpi = pd.read_csv('downloads/ONSRPI.csv', header=7, names=['date','RPI'])
+monthly_start = df_ons_rpi[df_ons_rpi['date']=='1987 JAN'].index[0]
+monthly_index= df_ons_rpi.iloc[monthly_start:].copy()
 
-for (year, month), fixing in inflation_fixings:
-    rpi.addFixing(ql.Date(1, month, year), fixing)
+def ql_date(d):
+    iso_ts = pd.to_datetime(d, format='%Y %b')
+    return ql.Date(iso_ts.day, iso_ts.month, iso_ts.year)
+
+monthly_index['date']=monthly_index['date'].apply(ql_date)
+inflation_list = list(
+    monthly_index.loc[
+        monthly_index['date'] < calendar.advance(evaluationDate, -1, ql.Months)
+        ].itertuples(index=False, name=None)
+        )
+
+
+for date, fixing in inflation_list:
+    rpi.addFixing(date, fixing)
 
 inflation_quotes = [
     (ql.Period(1, ql.Years), 3.0495),
@@ -175,7 +162,7 @@ day_counter = ql.ActualActual(ql.ActualActual.ISMA)
 interpolation = ql.CPI.Linear
 
 nominal_curve = ql.YieldTermStructureHandle(
-    ql.FlatForward(evaluationDate, 0.04, day_counter)
+    ql.FlatForward(evaluationDate, 0.05, day_counter)
 )
 
 helpers = []
@@ -184,18 +171,6 @@ helpers = []
 for tenor, quote in inflation_quotes:
     maturity = calendar.advance(today, tenor)
     helpers.append(
-        #         ql.ZeroCouponInflationSwapHelper(
-        #             quote=ql.makeQuoteHandle(quote / 100),
-        #             swapObsLag=observation_lag,
-        #             maturity=maturity_date,
-        #             calendar=calendar,
-        #             paymentConvention=ql.Following,
-        #             dayCounter=day_counter,
-        #             zii=rpi,
-        #             observationInterpolation=interpolation,
-        #             nominalTermStructure=nominal_curve,
-        #         )
-        #     )
         ql.ZeroCouponInflationSwapHelper(
             ql.makeQuoteHandle(quote / 100),
             observation_lag,
@@ -218,15 +193,17 @@ inflation_curve = ql.PiecewiseZeroInflation(
     dayCounter=ql.Actual365Fixed(),
     instruments=helpers,
 )
+print(rpi.lastFixingDate())
 
 inflation_handle = ql.RelinkableZeroInflationTermStructureHandle(inflation_curve)
 
 rpi = ql.UKRPI(inflation_handle)
 
-notional = 1000000
+notional = 100
 issue_date = ql.Date(22, ql.May, 2007)
 maturity_date = ql.Date(21, ql.November, 2047)
 fixing_date = calendar.advance(evaluationDate, -lag, ql.Months)
+print(fixing_date)
 
 fixedRates = [0.0075]
 
@@ -238,7 +215,9 @@ observationInterpolation = ql.CPI.Linear
 settlementDays = 3
 growthOnly = False
 
-baseCPI = rpi.pastFixing(calendar.advance(issue_date, -lag, ql.Months))
+baseCPI = rpi.pastFixing(calendar.advance(evaluationDate, -lag, ql.Months))
+
+print("Base CPI:", baseCPI)
 
 
 fixedSchedule = ql.Schedule(
@@ -266,15 +245,14 @@ bond = ql.CPIBond(
     fixedPaymentConvention,
 )
 
-# #bond2= ql.QuantLib.C
 
 bondEngine = ql.DiscountingBondEngine(nominal_curve)
 bond.setPricingEngine(bondEngine)
-# print(bond.NPV())
+
 clean_price = 99.75
 price = ql.BondPrice(clean_price, ql.BondPrice.Clean)
 print(bond.cleanPrice())
-# print ("Dirty Price:", bond.dirtyPrice())
+print ("Dirty Price:", bond.dirtyPrice())
 compounding = ql.Compounded
 yield_rate = bond.bondYield(price, fixedDayCounter, compounding, ql.Semiannual)
 
@@ -300,15 +278,15 @@ print("Days to next coupon:", days_to_next_coupon)
 days_between_coupon = cashflows[0][1] - [s for s in fixedSchedule.until(bond.settlementDate())][-2] 
 print("Days between coupon:", days_between_coupon)
 # Cash flow due on next quasi-coupon date, per £100 nominal of the     gilt (may be zero if the gilt has a long first dividend period or if the gilt     settles in its ex-dividend period; or may be greater or less than 2 c      times the RPI Ratio during long or short first dividend periods      respectively).
-d_1 = 0.0
+d_1 = cashflows[0][0]
 # Cash flow due on next but one quasi-coupon date, per £100      nominal of the gilt (may be greater than 2 c times the RPI Ratio during     long first dividend periods)4.
-d_2 = 0.0
+d_2 = cashflows[1][0]
 # coupon per £100 nominal
-cpn_ = 0.0
+cpn_ = 0.0075 * 100
 # number of full quasi-coupon periods from the next quasi-coupon date after the settlement date to the redemption date
-number_cpns = 0.0
+number_cpns = len(cashflows)-1
 # Semi-annually compounded real redemption yield (decimal)
-_rho = 0.025
+_rho = 0.008
 # discount factor
 w_df = 1 / (1 + _rho / 2)
 
@@ -316,6 +294,9 @@ w_df = 1 / (1 + _rho / 2)
 price = w_df ** (days_to_next_coupon / days_between_coupon) * (
     d_1
     + d_2 * w_df
-    + cpn_ * (w_df**2.0) * (1 - w_df * (number_cpns - 1)) / (2 * (1 - w_df))
+    + cpn_ * (w_df**2.0) * (1 - w_df ** (number_cpns - 1)) / (2 * (1 - w_df))
     + 100 * w_df**number_cpns
 )
+
+print(price)
+
