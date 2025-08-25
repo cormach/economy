@@ -1,6 +1,7 @@
 import QuantLib as ql
 import datetime as dt
 import pandas as pd
+from scipy.optimize import fsolve
 
 # https://www.quantlibguide.com/Inflation%20indexes%20and%20curves.html
 
@@ -271,32 +272,53 @@ print(bond.settlementDate())
 print([s for s in fixedSchedule.until(bond.settlementDate())])
 # DMO
 
-# Number of calendar days from the settlement date to the next quasi-coupon date r
-days_to_next_coupon = cashflows[0][1] - bond.settlementDate()
-print("Days to next coupon:", days_to_next_coupon)
-# number of full days between quasi-coupon dates s
-days_between_coupon = cashflows[0][1] - [s for s in fixedSchedule.until(bond.settlementDate())][-2] 
-print("Days between coupon:", days_between_coupon)
-# Cash flow due on next quasi-coupon date, per £100 nominal of the     gilt (may be zero if the gilt has a long first dividend period or if the gilt     settles in its ex-dividend period; or may be greater or less than 2 c      times the RPI Ratio during long or short first dividend periods      respectively).
-d_1 = cashflows[0][0]
-# Cash flow due on next but one quasi-coupon date, per £100      nominal of the gilt (may be greater than 2 c times the RPI Ratio during     long first dividend periods)4.
-d_2 = cashflows[1][0]
-# coupon per £100 nominal
-cpn_ = 0.0075 * 100
-# number of full quasi-coupon periods from the next quasi-coupon date after the settlement date to the redemption date
-number_cpns = len(cashflows)-1
-# Semi-annually compounded real redemption yield (decimal)
-_rho = 0.008
-# discount factor
-w_df = 1 / (1 + _rho / 2)
 
-# Real dirty price per £100 nominal
-price = w_df ** (days_to_next_coupon / days_between_coupon) * (
-    d_1
-    + d_2 * w_df
-    + cpn_ * (w_df**2.0) * (1 - w_df ** (number_cpns - 1)) / (2 * (1 - w_df))
-    + 100 * w_df**number_cpns
-)
+def real_price(rho):
+        
+    # Number of calendar days from the settlement date to the next quasi-coupon date r
+    days_to_next_coupon = cashflows[0][1] - bond.settlementDate()
+    # number of full days between quasi-coupon dates s
+    days_between_coupon = cashflows[0][1] - [s for s in fixedSchedule.until(bond.settlementDate())][-2]
+    # Cash flow due on next quasi-coupon date, per £100 nominal of the     gilt (may be zero if the gilt has a long first dividend period or if the gilt     settles in its ex-dividend period; or may be greater or less than 2 c      times the RPI Ratio during long or short first dividend periods      respectively).
+    d_1 = cashflows[0][0]
+    # Cash flow due on next but one quasi-coupon date, per £100      nominal of the gilt (may be greater than 2 c times the RPI Ratio during     long first dividend periods)4.
+    d_2 = cashflows[1][0]
+    # coupon per £100 nominal
 
-print(price)
+    # number of full quasi-coupon periods from the next quasi-coupon date after the settlement date to the redemption date
+    number_cpns = len(cashflows)-1
+    # Semi-annually compounded real redemption yield (decimal)
 
+    # discount factor
+    w_df = 1 / (1 + rho / 2)
+    print(rho)
+
+    # Real dirty price per £100 nominal
+    price = w_df ** (days_to_next_coupon / days_between_coupon) * (
+        d_1
+        + d_2 * w_df
+        + cpn *100 * (w_df**2.0) * (1 - w_df ** (number_cpns - 1)) / (2 * (1 - w_df))
+        + 100 * w_df**number_cpns
+    )
+    return price
+
+_rho = 0.01
+cpn = 0.0075
+
+print(real_price(rho=_rho))
+# 6370/6173
+p = 112.81*6370/6173
+print(p)
+func = lambda rho: p - real_price(rho=rho)
+
+# rho_initial_guess = 0.0
+# rho_solution = fsolve(func, rho_initial_guess)
+
+solver = ql.Brent()
+
+accuracy = 1e-5
+guess = 0.01
+step = 0.0001
+r = solver.solve(func, accuracy, guess, step)
+
+print(r)
