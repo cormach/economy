@@ -79,3 +79,20 @@ def gilt_yield(
         )
         * 100
     )
+
+
+def yield_series(price_series, issue_date, maturity_date, first_cpn_date, last_cpn_date, coupon):
+    # Calculate the yield series based on the provided parameters
+    name = price_series.name
+    df = price_series.reset_index().rename(columns={name: "price"})
+    df['yield'] = df.apply(lambda x: gilt_yield(
+        today=x['index'].isoformat().split("T")[0],
+        issue_date=issue_date,
+        maturity_date=maturity_date,
+        first_cpn_date=first_cpn_date,
+        last_cpn_date=last_cpn_date,
+        clean_price=x["price"],
+        coupon=coupon/100
+    ), axis=1)
+    df.set_index('index', inplace=True)
+    return df
