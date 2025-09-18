@@ -25,6 +25,15 @@ Old-style,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,END
 New-style,,,,,,,,,,,,,,,,,,,,,unindexed,,,,,interpolated,,,,,,,,,,,END
 55200,1QIL17,B0V3WQ7,GB00B0V3WQ75,1.25,Index-linked,,,,2017,8 Feb 2006,22 May 2006,,22 Nov 2017,,22 Nov 2017,2,22 May,22 Nov,,,0.355663,,,,,193.72500,,,,,,,,,,,END
 55800,0AIL73,BM8Z2W6,GB00BM8Z2W66,0.125,Index-linked,,,,2073,24 Nov 2021,22 Mar 2022,,22 Mar 2073,,,2,22 Mar,22 Sep,,,??,,,,,,,,,,,,,,,,END
+END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END
+Worksheet name:,,STRIPS,Last Updated December 2023,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,END
+Strips,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,END
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,END
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,END
+Sequence,Inst Code,ISIN Code,%,Stock,Suffix,Special features,First year,Last year,Issue date,First coupon payable on date,Earliest redemption date,Latest redemption date,"A (B, C ...) stock merged on date",Actually redeemed,Frequency,Payment date 1,Payment date 2,Payment date 3,Payment date 4,First coupon,Col for I-L,Col for I-L,Col for I-L,Col for I-L,Col for I-L,Number of calls,Call payment 1,due on,Call payment 2,due on,Call payment 3,due on,Call payment 4,due on,,,END
+60000,UKT07JUN1998C,GB0000504471,,UK Treasury Strip 07JUN1998C ,,,,1998,,,,7 Jun 1998,,7 Jun 1998,,,,,,,,,,,,,,,,,,,,,,,END
+END,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,END
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,END
 END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END"""
 
     with patch("builtins.open", mock_open(read_data=mock_csv_content)):
@@ -156,10 +165,8 @@ END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,
         }
     )
 
-    assert len(result) == 3
-    assert "Conventionals" in result
-    assert "Index-Linked New-style" in result
-    assert "Index-Linked Old-style" in result
+    assert len(result) == 4
+    assert set(result.keys()) == set(["Conventionals", "Index-Linked New-style", "Index-Linked Old-style", "Strips"])
 
     assert result["Conventionals"].equals(conv)
     assert result["Index-Linked New-style"].equals(il)

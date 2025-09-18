@@ -69,6 +69,12 @@ def load_csv_blocks(file_path, encoding="latin1"):
                 case "New-style":
                     collecting_data = True
                     linker_type = "New-style"
+                
+                case "Strips":
+                    collecting_data = True
+                    current_title="Strips"
+                    index_linked = False
+                    linker_type = None
 
                 case "Sequence":
                     end = row.index("END")
@@ -92,7 +98,7 @@ def load_csv_blocks(file_path, encoding="latin1"):
 
                 case "END":
                     collecting_data = False
-                    break
+                    continue
     # incredibly the BGS has a data error on the id in the details
     dataframes["Conventionals"] = dataframes["Conventionals"].replace("32112", "32110")
     try:

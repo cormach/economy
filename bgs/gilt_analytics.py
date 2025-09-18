@@ -4,17 +4,12 @@ import QuantLib as ql
 def from_iso(date):
     return ql.Date(date, "%Y-%m-%d")
 
-
-def gilt_yield(
-    today, issue_date, maturity_date, first_cpn_date, last_cpn_date, clean_price, coupon
-):
+def fixed_bond_schedule(trade_date, issue_date, maturity_date, first_cpn_date, last_cpn_date):
     issue_dt = from_iso(issue_date)
     mat_dt = from_iso(maturity_date)
     first_cpn_dt = from_iso(first_cpn_date)
     last_cpn_dt = from_iso(last_cpn_date)
-    ql.Settings.instance().evaluationDate = from_iso(today)
-
-    price = ql.BondPrice(clean_price, ql.BondPrice.Clean)
+    ql.Settings.instance().evaluationDate = from_iso(trade_date)
 
     tenor = ql.Period(ql.Semiannual)
     calendar = ql.UnitedKingdom()
@@ -46,6 +41,56 @@ def gilt_yield(
         end_of_month,
         [True] * (len(sch) - 1),
     )
+    return fbSchedule
+
+def coupon_schedule(trade_date, issue_date, maturity_date, first_cpn_date, last_cpn_date):
+    schedule = fixed_bond_schedule(trade_date, issue_date, maturity_date, first_cpn_date, last_cpn_date)
+    coupons = [d for d in schedule if d > from_iso(trade_date)]
+    return coupons
+
+
+def gilt_yield(
+    trade_date, issue_date, maturity_date, first_cpn_date, last_cpn_date, clean_price, coupon
+):
+
+    issue_dt = from_iso(issue_date)
+    ql.Settings.instance().evaluationDate = from_iso(trade_date)
+
+    price = ql.BondPrice(clean_price, ql.BondPrice.Clean)
+
+    fbSchedule = fixed_bond_schedule(
+        trade_date, issue_date, maturity_date, first_cpn_date, last_cpn_date)
+
+    # tenor = ql.Period(ql.Semiannual)
+    # calendar = ql.UnitedKingdom()
+    business_convention = ql.Unadjusted
+    # termination_business_convention = ql.Unadjusted
+    # date_generation = ql.DateGeneration.Forward
+    # end_of_month = False
+
+    # fbSchedule = ql.Schedule(
+    #     issue_dt,
+    #     mat_dt,
+    #     tenor,
+    #     calendar,
+    #     business_convention,
+    #     termination_business_convention,
+    #     date_generation,
+    #     end_of_month,
+    #     first_cpn_dt,
+    #     last_cpn_dt,
+    # )
+    # sch = [x for x in fbSchedule]
+    # fbSchedule = ql.Schedule(
+    #     sch,
+    #     calendar,
+    #     business_convention,
+    #     termination_business_convention,
+    #     tenor,
+    #     date_generation,
+    #     end_of_month,
+    #     [True] * (len(sch) - 1),
+    # )
     cpns = [coupon]
 
     settle_days = 1
@@ -86,7 +131,7 @@ def yield_series(price_series, issue_date, maturity_date, first_cpn_date, last_c
     name = price_series.name
     df = price_series.reset_index().rename(columns={name: "price"})
     df['yield'] = df.apply(lambda x: gilt_yield(
-        today=x['index'].isoformat().split("T")[0],
+        trade_date=x['index'].isoformat().split("T")[0],
         issue_date=issue_date,
         maturity_date=maturity_date,
         first_cpn_date=first_cpn_date,
