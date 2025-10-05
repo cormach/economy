@@ -4,10 +4,12 @@ import pandas as pd
 from bgs.linker_analytics import linker_real_yield
 from bgs.load_gilt_details import load_csv_blocks
 
+
 @pytest.fixture
 def details_file():
     details = load_csv_blocks("downloads/BGSDetails.csv")
-    return details['Index-Linked New-style']
+    return details["Index-Linked New-style"]
+
 
 @pytest.fixture
 def tradeweb_closes():
@@ -44,8 +46,6 @@ def tradeweb_closes():
     UKGI 0.125 03/73,15/08/2023,GB00BM8Z2W66,Index-linked,0.125,22/03/2073,71.74,87.509773,0.819524,47.513593,0.060866
     """
     return pd.read_csv(StringIO(new_linker_tradeweb))
-
-
 
 
 @pytest.fixture
@@ -161,30 +161,33 @@ def test_linker(monthly_rpi_index, inflation_spot_curve):
     assert round(r, 8) == 0.01373071
 
 
-
-
-
-
 def test_tradeweb_closes(tradeweb_closes, details_file):
     import QuantLib as ql
 
-    linkers = tradeweb_closes['ISIN'].to_list()
-    clean_price = tradeweb_closes.loc[tradeweb_closes['ISIN']=="GB00B128DH60"]['Clean Price'].values[0]
-    assert clean_price ==100.456
-    test_file = tradeweb_closes[['ISIN','Clean Price']].merge(
+    linkers = tradeweb_closes["ISIN"].to_list()
+    clean_price = tradeweb_closes.loc[tradeweb_closes["ISIN"] == "GB00B128DH60"][
+        "Clean Price"
+    ].values[0]
+    assert clean_price == 100.456
+    test_file = tradeweb_closes[["ISIN", "Clean Price"]].merge(
         details_file[
             [
                 "Latest redemption date",
                 "First coupon payable on date",
                 "%",
-                "Issue date","ISIN Code"]
-        ].rename(
-            columns={"ISIN Code": "ISIN"}
-        ), on="ISIN", how="inner")
-    
-    details_file.loc[details_file['ISIN Code']=="GB00B128DH60"]['Latest redemption date']
+                "Issue date",
+                "ISIN Code",
+            ]
+        ].rename(columns={"ISIN Code": "ISIN"}),
+        on="ISIN",
+        how="inner",
+    )
+
+    details_file.loc[details_file["ISIN Code"] == "GB00B128DH60"][
+        "Latest redemption date"
+    ]
 
     for linker in linkers:
-        assert linker in details_file['ISIN Code'].values
+        assert linker in details_file["ISIN Code"].values
     assert tradeweb_closes is not None
     assert not tradeweb_closes.empty

@@ -1,4 +1,5 @@
-from bgs.gilt_analytics import gilt_yield
+from bgs.gilt_analytics import gilt_yield, Gilt
+import QuantLib as ql
 
 
 def test_yld():
@@ -20,7 +21,7 @@ def test_yld():
         coupon,
     )
 
-    assert round(yld, 6) == 4.811837  # 4.811837 on tradeweb eod prices
+    assert 100 * round(yld, 8) == 4.811837  # 4.811837 on tradeweb eod prices
 
 
 def test_low_yld():
@@ -42,4 +43,23 @@ def test_low_yld():
         coupon,
     )
 
-    assert round(yld, 6) == 0.546001
+    assert 100 * round(yld, 8) == 0.546002
+
+
+def test_price():
+    today = "2024-01-31"
+    issue_date = "2018-07-25"
+    maturity_date = "2024-04-22"
+    first_cpn_date = "2018-10-22"
+    last_cpn_date = "2024-04-22"
+    coupon = 0.01
+
+    bond = Gilt(
+        trade_date=today,
+        issue_date=issue_date,
+        maturity_date=maturity_date,
+        first_cpn_date=first_cpn_date,
+        last_cpn_date=last_cpn_date,
+        coupon=coupon,
+    )
+    assert round(bond.price(0.05), 4) == 99.1289

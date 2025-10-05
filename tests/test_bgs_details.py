@@ -166,7 +166,9 @@ END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,END,
     )
 
     assert len(result) == 4
-    assert set(result.keys()) == set(["Conventionals", "Index-Linked New-style", "Index-Linked Old-style", "Strips"])
+    assert set(result.keys()) == set(
+        ["Conventionals", "Index-Linked New-style", "Index-Linked Old-style", "Strips"]
+    )
 
     assert result["Conventionals"].equals(conv)
     assert result["Index-Linked New-style"].equals(il)

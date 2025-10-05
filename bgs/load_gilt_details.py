@@ -69,10 +69,10 @@ def load_csv_blocks(file_path, encoding="latin1"):
                 case "New-style":
                     collecting_data = True
                     linker_type = "New-style"
-                
+
                 case "Strips":
                     collecting_data = True
-                    current_title="Strips"
+                    current_title = "Strips"
                     index_linked = False
                     linker_type = None
 
